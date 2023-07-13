@@ -1,0 +1,23 @@
+@import './vars.scss';
+
+.delete-button {
+  position: fixed;
+  bottom: 15px;
+  right: 25px;
+  font-size: 18px;
+  padding: 10px 15px;
+  border: 0;
+  border-radius: $border-radius;
+  color: white;
+  background-color: firebrick;
+  cursor: pointer;
+  transition: $transition;
+
+  &:hover {
+    scale: 1.1;
+  }
+
+  &:active {
+    scale: 1;
+  }
+}
