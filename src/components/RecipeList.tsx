@@ -65,15 +65,15 @@ const RecipeList = ({ recipes, addRecipes, selectedRecipes, onToggleSelect }: Pr
     window.addEventListener('scroll', handleScroll);
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [fetching, skip, page]);
+  }, [fetching]);
 
   useEffect(() => {
     if (recipes.length === 0) {
       return;
     }
 
-    if (recipes.length < 15) {
-      return setPage((prev) => prev + 1);
+    if (recipes.length - skip <= 15) {
+      return setFetching(true);
     }
 
     setRecipesToRender(recipes.slice(skip, 15 + skip));
