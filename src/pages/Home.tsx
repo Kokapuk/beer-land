@@ -5,7 +5,7 @@ import styles from '../styles/Home.module.scss';
 
 const Home = () => {
   const recipes = useRecipeStore((state) => state.recipes);
-  const addRecipe = useRecipeStore((state) => state.add);
+  const addRecipes = useRecipeStore((state) => state.add);
   const removeRecipes = useRecipeStore((state) => state.remove);
   const [selectedRecipes, setSelectedRecipes] = useState<number[]>([]);
 
@@ -29,7 +29,12 @@ const Home = () => {
           Delete
         </button>
       )}
-      <RecipeList recipes={recipes} addRecipe={addRecipe} selectedRecipes={selectedRecipes} onToggleSelect={handleToggleSelect} />
+      <RecipeList
+        recipes={recipes}
+        addRecipes={addRecipes}
+        selectedRecipes={selectedRecipes}
+        onToggleSelect={handleToggleSelect}
+      />
     </>
   );
 };

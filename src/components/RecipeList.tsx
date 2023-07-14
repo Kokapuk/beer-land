@@ -6,24 +6,27 @@ import api from '../utils/api';
 
 interface Props {
   recipes: Recipe[];
-  addRecipe(recipe: Recipe[]): void;
+  addRecipes(recipe: Recipe[]): void;
   selectedRecipes: number[];
   onToggleSelect(id: number): void;
 }
 
-const RecipeList = ({ recipes, addRecipe, selectedRecipes, onToggleSelect }: Props) => {
+const RecipeList = ({ recipes, addRecipes, selectedRecipes, onToggleSelect }: Props) => {
   const [skip, setSkip] = useState(0);
   const [page, setPage] = useState(1);
   const [recipesToRender, setRecipesToRender] = useState<Recipe[]>([]);
   const [fetching, setFetching] = useState(true);
 
   const fetchRecipes = async () => {
-    setFetching(true);
+    if (!fetching) {
+      return;
+    }
 
     try {
-      const recipe = await api.getMany(page);
-      addRecipe(recipe);
-      setRecipesToRender(recipe.slice(skip, 15 + skip));
+      const recipes = await api.getMany(page);
+      setPage((prev) => prev + 1);
+      addRecipes(recipes);
+      setRecipesToRender(recipes.slice(skip, 15 + skip));
     } finally {
       setFetching(false);
     }
@@ -31,14 +34,14 @@ const RecipeList = ({ recipes, addRecipe, selectedRecipes, onToggleSelect }: Pro
 
   useEffect(() => {
     fetchRecipes();
-  }, [page]);
+  }, [fetching]);
 
   const handleScroll = () => {
     if (fetching) {
       return;
     }
 
-    if (document.documentElement.scrollTop < 100) {
+    if (document.documentElement.scrollTop < 300) {
       setSkip((prev) => {
         if (prev === 0) {
           return 0;
@@ -48,11 +51,11 @@ const RecipeList = ({ recipes, addRecipe, selectedRecipes, onToggleSelect }: Pro
       });
     } else if (document.documentElement.offsetHeight - (window.innerHeight + document.documentElement.scrollTop) < 300) {
       setSkip((prev) => {
-        if (prev >= recipes.length) {
+        if (recipes.length - prev <= 15) {
+          setFetching(true);
           return prev;
         }
 
-        setPage((prev) => prev + 1);
         return prev + 5;
       });
     }
@@ -65,6 +68,10 @@ const RecipeList = ({ recipes, addRecipe, selectedRecipes, onToggleSelect }: Pro
   }, [fetching, skip, page]);
 
   useEffect(() => {
+    if (recipes.length === 0) {
+      return;
+    }
+
     if (recipes.length < 15) {
       return setPage((prev) => prev + 1);
     }
@@ -82,6 +89,7 @@ const RecipeList = ({ recipes, addRecipe, selectedRecipes, onToggleSelect }: Pro
           recipe={recipe}
         />
       ))}
+      {fetching && <p>Loading...</p>}
     </div>
   );
 };
